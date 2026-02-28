@@ -55,6 +55,7 @@ class FumoViewModel(private val repository: FumoRepository) : ViewModel() {
         _ultimoLogCriado.value = repository.registrarAgora()
     }
 
+
     fun desfazerUltimo() = viewModelScope.launch {
         _ultimoLogCriado.value?.let { repository.desfazer(it) }
     }
@@ -67,6 +68,11 @@ class FumoViewModel(private val repository: FumoRepository) : ViewModel() {
     fun totalHoje(logs: List<LogFumo>): Int {
         val hoje = LocalDate.now()
         return logs.count { LocalDate.ofInstant(it.instante, ZoneId.systemDefault()) == hoje }
+    }
+
+    fun totalUltimosDias(logs: List<LogFumo>, dias: Long): Int {
+        val limite = Instant.now().minusSeconds(dias * 24 * 60 * 60)
+        return logs.count { it.instante.isAfter(limite) }
     }
 
     fun custoHoje(logs: List<LogFumo>, perfil: Perfil): Double {
